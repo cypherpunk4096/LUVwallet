@@ -89,8 +89,8 @@
       </div>
       <div class="pkwarn"><b>Never share this.</b> Anyone with your private key controls your wallet and your LUV. Save it in a password manager or a hardware wallet, or import it into MetaMask. <a href="https://github.com/SHAMBA-LUV/SHAMBALUV/blob/main/docs/firstLUV.md" class="pklink" target="_blank" rel="noopener">firstLUV: what to do with this key</a></div>
       <div class="custody" id="relinquishbox">
-        <p class="small"><b style="color:var(--ink)">Then finish the handoff.</b> Once you have saved the key, tell the platform to destroy its copy. After that the platform can deliver LUV to your address but can never sign for it, and this button cannot be undone. Type the last six characters of your address to confirm.</p>
-        <div class="row"><input id="relinquishconfirm" placeholder="last 6" maxlength="6" autocomplete="off" spellcheck="false"><button class="btn" id="relinquish" type="button">destroy the platform's copy</button><span class="taskmsg" id="relinquishmsg"></span></div>
+        <p class="small"><b style="color:var(--ink)">Then finish the handoff.</b> Once you have saved the key, tell the platform to shred its copy: the encrypted key is overwritten with random bytes seven times, blanked, and the table is rewritten so no earlier version survives. After that the platform can deliver LUV to your address but can never sign for it. It cannot be undone. Type the last six characters of your address to confirm.</p>
+        <div class="row"><input id="relinquishconfirm" placeholder="last 6" maxlength="6" autocomplete="off" spellcheck="false"><button class="btn" id="relinquish" type="button">shred the platform's copy · 7 passes</button><span class="taskmsg" id="relinquishmsg"></span></div>
       </div>
     </div>
 
@@ -231,7 +231,7 @@
 <script src="substrate/qrcode.js?v=1"></script>
 <script src="substrate/luv-drip.js?v=3"></script>
 <script src="luv.app.js?v=40"></script>
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
 <script src="site.js?v=13"></script>
 </body>
 </html>

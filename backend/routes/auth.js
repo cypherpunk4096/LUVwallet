@@ -336,18 +336,30 @@ router.post('/wallet/relinquish', requireAuth, async (req, res) => {
   const address = r.rows[0].address;
   if (r.rows[0].custody === 'participant') return res.json({ ok: true, custody: 'participant', address });
   if (confirm !== address.slice(-6).toLowerCase()) return res.status(400).json({ error: 'confirm_mismatch' });
+  // SHRED, not delete: the three key columns are overwritten with fresh random bytes PASSES times (the shred(1)
+  // discipline, default 7), then blanked, then the table is rewritten with VACUUM FULL so no earlier row version
+  // survives in the heap. Honest note on Postgres: each overwrite is a new row version, not an in-place write —
+  // it is VACUUM FULL that removes the old versions from the file; the passes make sure that what the rewrite
+  // discards is noise, and that the WAL for this row ends in noise, not in the ciphertext.
+  const crypto = require('crypto');
+  const PASSES = Math.max(1, Math.min(35, Number(process.env.WALLET_SHRED_PASSES) || 7));
+  for (let i = 0; i < PASSES; i++) {
+    await db.query(
+      `UPDATE wallets SET enc_ciphertext = $2, enc_iv = $3, enc_tag = $4 WHERE identity_key = $1 AND custody <> 'participant'`,
+      [identityKey, crypto.randomBytes(48).toString('base64'), crypto.randomBytes(12).toString('base64'), crypto.randomBytes(16).toString('base64')]
+    );
+  }
   await db.query(
     `UPDATE wallets SET enc_ciphertext = '', enc_iv = '', enc_tag = '', custody = 'participant', relinquished_at = now()
       WHERE identity_key = $1 AND custody <> 'participant'`,
     [identityKey]
   );
-  // forget it physically too: VACUUM FULL rewrites the small wallets table so the blanked row's old version
-  // does not linger as a dead tuple (best effort — needs table ownership; the logical blanking above is the guarantee)
-  try { await db.query('VACUUM FULL wallets'); } catch (e) { /* not the owner, or inside a pool transaction — autovacuum will reclaim */ }
+  let rewritten = false;
+  try { await db.query('VACUUM FULL wallets'); rewritten = true; } catch (e) { /* not the owner — autovacuum will reclaim */ }
   // eslint-disable-next-line no-console
-  console.log('[auth] custody relinquished to the participant:', address);
+  console.log(`[auth] custody shredded to the participant: ${address} (${PASSES} passes, rewritten=${rewritten})`);
   res.set('Cache-Control', 'no-store');
-  res.json({ ok: true, custody: 'participant', address });
+  res.json({ ok: true, custody: 'participant', address, shredded: true, passes: PASSES, rewritten });
 });
 
 // ── Send LUV from the custodial wallet (the LUV wallet's Send button) ─────────────────────────

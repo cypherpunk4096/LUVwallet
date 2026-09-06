@@ -21,9 +21,9 @@
     var st = $("custodystate"), box = $("relinquishbox"), pk = $("pkrow"); if (!st) return;
     var c = me.custody || (me.provider === "metamask" ? "external" : "platform");
     st.className = "state " + c;
-    if (c === "participant") { st.textContent = "custody: yours — the platform's copy was destroyed" + (me.relinquishedAt ? " on " + new Date(me.relinquishedAt).toISOString().slice(0, 10) : ""); if (box) box.hidden = true; var f = $("pkfield"), b = $("revealpk"); if (f) f.textContent = "the platform no longer holds this key"; if (b) b.hidden = true; }
+    if (c === "participant") { st.textContent = "custody: yours — the platform's copy was shredded" + (me.relinquishedAt ? " on " + new Date(me.relinquishedAt).toISOString().slice(0, 10) : ""); if (box) box.hidden = true; var f = $("pkfield"), b = $("revealpk"); if (f) f.textContent = "the platform no longer holds this key"; if (b) b.hidden = true; }
     else if (c === "external") { if (pk) pk.hidden = true; }
-    else { st.textContent = "custody: the platform holds an encrypted copy — reveal, save, then destroy it"; if (box) box.hidden = false; }
+    else { st.textContent = "custody: the platform holds an encrypted copy — reveal, save, then shred it"; if (box) box.hidden = false; }
   }
   fetch("/auth/me", { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (me) { if (me) paintCustody(me); }).catch(function () {});
 
@@ -56,10 +56,10 @@
   if (btn) btn.addEventListener("click", function () {
     var v = (inp && inp.value || "").trim();
     if (v.length !== 6) { msg.textContent = "type the last six characters of your address"; return; }
-    btn.disabled = true; msg.textContent = "destroying the platform's copy…";
+    btn.disabled = true; msg.textContent = "shredding the platform's copy…";
     fetch("/auth/wallet/relinquish", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: v }) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (x) { if (x.ok) { msg.textContent = "done. The key exists only where you saved it."; paintCustody({ custody: "participant", relinquishedAt: Date.now() }); } else { msg.textContent = x.j && x.j.error === "confirm_mismatch" ? "those six characters do not match your address" : "could not complete: " + (x.j && x.j.error || "error"); btn.disabled = false; } })
+      .then(function (x) { if (x.ok) { msg.textContent = "shredded: " + (x.j.passes || 7) + " random overwrites, blanked, table " + (x.j.rewritten ? "rewritten" : "queued for rewrite") + ". The key exists only where you saved it."; paintCustody({ custody: "participant", relinquishedAt: Date.now() }); } else { msg.textContent = x.j && x.j.error === "confirm_mismatch" ? "those six characters do not match your address" : "could not complete: " + (x.j && x.j.error || "error"); btn.disabled = false; } })
       .catch(function () { msg.textContent = "network error"; btn.disabled = false; });
   });
 })();
