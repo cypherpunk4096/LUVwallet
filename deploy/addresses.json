@@ -1,0 +1,23 @@
+{
+  "status": "live",
+  "phase": 3,
+  "phaseName": "The Price of LUV",
+  "airdrop": "closed",
+  "trade": "https://app.uniswap.org/swap?chain=ethereum&inputCurrency=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&outputCurrency=0x2711111111683B8708cb9a48cBf36a51315F8254",
+  "network": "ethereum",
+  "chainId": 1,
+  "explorer": "https://etherscan.io",
+  "deployer": "0x10f7Ee226B16bea7f365Dc1eDEF159Fc1957D169",
+  "salt": "luv.launcher.6aodu",
+  "contracts": {
+    "Create3d": "0xa5A2581d564248801cc5e06DbB764c99c170320A",
+    "LuvLauncher": "0xBAAc0a44698230661018A9eED48b4e52F14d7523",
+    "ShambaLuv": "0x2711111111683B8708cb9a48cBf36a51315F8254",
+    "ShambaLuvAirdrop": "0xdf2C1836550c5711EF9c021cB0de86241dc1DEf3",
+    "LuvBatchGesture": "0xc734e05A6E944D700FdA948fe7B2D0bDF115B4dD",
+    "IncentiveDistributor": "0x607E477AB12406A3294A7Ba63817103f92D8f806",
+    "LUVLocker": "0xe07ACAde4bE2bbc264EA702880ed988EBae9B898",
+    "LuvAccountFactory": "0xB8cb4780d79ce0c6DA7700ad46d976376AC21D09",
+    "LuvPaymaster": "0xa5Bee1887F145893Fd3698Eb0b4c761d088Ea68A"
+  }
+}

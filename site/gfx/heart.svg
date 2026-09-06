@@ -1,0 +1,10 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M50 85C50 85 10 60 10 35C10 20 22.5 10 35 10C42.5 10 47.5 15 50 20C52.5 15 57.5 10 65 10C77.5 10 90 20 90 35C90 60 50 85 50 85Z" fill="url(#paint0_linear_heart)"/>
+<defs>
+<linearGradient id="paint0_linear_heart" x1="10" y1="10" x2="90" y2="85" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ff006e"/>
+<stop offset="0.5" stop-color="#8338ec"/>
+<stop offset="1" stop-color="#3a86ff"/>
+</linearGradient>
+</defs>
+</svg>

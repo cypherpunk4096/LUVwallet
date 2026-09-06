@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your LUVwallet — SHAMBA LUV</title>
+<meta name="description" content="Sign in and open your LUVwallet: a sovereign ERC-4337 smart account created for you, the key handed to you, your LUV, the daily LUVdrip, and your LUV card.">
+<link rel="canonical" href="https://luv.pythai.net/app.html">
+<meta name="robots" content="noindex,follow">
+<link rel="icon" href="gfx/heart.svg" type="image/svg+xml">
+<meta property="og:title" content="Your LUVwallet — SHAMBA LUV">
+<meta property="og:description" content="A sovereign wallet created for you, the key handed to you. Hold LUV, earn LUV.">
+<meta property="og:image" content="https://luv.pythai.net/gfx/og-card.png?v=2">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="site.css?v=10">
+<link rel="stylesheet" href="app.css?v=2">
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><img src="gfx/logo-transparent.png" alt="">SHAMBA LUV</a>
+  <a class="link" href="faq.html">FAQ</a>
+  <a class="link" href="chart.html">Chart</a>
+  <a class="link" href="roadmap.html">Roadmap</a>
+  <a class="link" href="app.html" aria-current="page">Wallet</a>
+  <a class="buy" href="https://app.uniswap.org/swap?chain=mainnet&amp;inputCurrency=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&amp;outputCurrency=0x2711111111683B8708cb9a48cBf36a51315F8254" target="_blank" rel="noopener"><img src="gfx/brand/uniswap_icon_white.svg" alt=""><span>Buy LUV</span></a>
+</div></nav>
+<main class="appwrap">
+
+  <!-- signed out: open your LUVwallet -->
+  <section class="openwallet landing-only plain">
+    <p class="kicker">Your wallet, your key, your LUV</p>
+    <h1>Open your LUVwallet.</h1>
+    <p class="lede">Sign in and a wallet is created for you on Ethereum: an ERC-4337 smart account with its own owner key. The key is yours. Hold the reveal button and it is shown to you once, then you can tell the platform to destroy its copy. From then on nobody but you can move your LUV. That is the cypherpunk4096 handoff: sovereignty over custody, consent over default.</p>
+    <div class="providers" id="providers"><button type="button" data-open-login>sign in to open your wallet</button></div>
+    <p class="small" style="margin-top:14px">Self-hosted sign-in. No wallet vendor, no seed phrase to type. Already hold your own key? Sign in with MetaMask and the platform never holds anything for you.</p>
+    <p class="small"><span class="healthdot" id="healthdot"></span> <small id="healthtext">checking…</small></p>
+  </section>
+
+  <div id="dashboard">
+    <div class="dashhead">
+      <h2>Your LUVwallet</h2>
+      <span class="via">signed in via <span id="youprovider">—</span></span>
+    </div>
+
+    <!-- the LUVwallet card — the card display of LUV -->
+    <div class="wcard" id="wcard">
+      <div class="wgrid">
+        <div>
+          <div class="wtitle"><img src="gfx/logo.png" alt=""><div><b>LUVwallet</b><span>ERC-4337 smart account on Ethereum, created for you</span></div></div>
+          <span class="pubkey-label">your address, share it to receive LUV</span>
+          <div class="walletaddr pub" id="youwallet">provisioning…</div>
+          <div class="wallet-actions">
+            <button class="wact" id="sendbtn" type="button">↑ Send</button>
+            <button class="wact" id="recvbtn" type="button">↓ Receive</button>
+          </div>
+          <div class="row">
+            <button class="btn" id="copywallet" type="button">copy address</button>
+            <a class="btn" id="walletexplorer" href="#" target="_blank" rel="noopener">on Etherscan</a>
+            <a class="btn" id="cardlink" href="card.html" target="_blank" rel="noopener">share my LUV card</a>
+          </div>
+          <div class="aatag" id="aatag" hidden>ERC-4337 smart account · created for you</div>
+          <div class="ownerline" id="ownerline" hidden></div>
+          <div class="balance" id="balance" style="margin-top:14px">…<small> LUV</small></div>
+          <div class="balstate" id="balstate">reading your balance…</div>
+          <div class="balline" id="balline"></div>
+          <div class="row"><button class="btn" id="refreshbal" type="button">refresh</button></div>
+        </div>
+        <div><div class="wqr" id="walletqr"></div></div>
+      </div>
+      <div class="wfoot">
+        <a class="cp4096" href="https://github.com/cypherpunk4096/standard" target="_blank" rel="noopener">⟁ cypherpunk4096</a>
+        <a class="cp4096" href="https://github.com/cypherpunk4096/LUVwallet" target="_blank" rel="noopener">LUVwallet source</a>
+        <span>made with <a href="https://luv.pythai.net/">LUV ❤</a></span>
+      </div>
+    </div>
+
+    <!-- custody: the key is handed to you, then the platform's copy is destroyed -->
+    <div class="panel pkrow" id="pkrow" hidden>
+      <div class="k">Take custody of your key</div>
+      <div class="custody"><span class="state" id="custodystate">custody: the platform holds an encrypted copy</span></div>
+      <p class="small">Your owner key was generated on our own infrastructure and stored encrypted with AES-256-GCM. It is shown only while you hold the button, and it is never sent anywhere else.</p>
+      <div class="pkfield" id="pkfield">•••• hidden — press &amp; hold to reveal ••••</div>
+      <button class="pkhold" id="revealpk" type="button">🔒 press &amp; hold to reveal your private key</button>
+      <div class="pkwarn"><b>Never share this.</b> Anyone with your private key controls your wallet and your LUV. Save it in a password manager or a hardware wallet, or import it into MetaMask. <a href="https://github.com/SHAMBA-LUV/SHAMBALUV/blob/main/docs/firstLUV.md" class="pklink" target="_blank" rel="noopener">firstLUV: what to do with this key</a></div>
+      <div class="custody" id="relinquishbox">
+        <p class="small"><b style="color:var(--ink)">Then finish the handoff.</b> Once you have saved the key, tell the platform to destroy its copy. After that the platform can deliver LUV to your address but can never sign for it, and this button cannot be undone. Type the last six characters of your address to confirm.</p>
+        <div class="row"><input id="relinquishconfirm" placeholder="last 6" maxlength="6" autocomplete="off" spellcheck="false"><button class="btn" id="relinquish" type="button">destroy the platform's copy</button><span class="taskmsg" id="relinquishmsg"></span></div>
+      </div>
+    </div>
+
+    <!-- the gesture, the LUVdrip, trade, share — the ids the dashboard script drives -->
+    <div class="dashhead">
+      <h2>welcome home <b>bonus</b></h2>
+      <span class="via">✨ your reward awaits ✨ · signed in via <span id="youprovider">—</span></span>
+    </div>
+    <div class="panel">
+      <div class="k">Your gesture</div>
+      <div class="congrats" id="congrats" hidden>🎉 Welcome home ❤ — your <b>1,000,000,000,000 LUV</b> is reserved</div>
+      <div class="congratssub" id="congratssub" hidden><b>We're proud of you.</b> It's recorded and waiting with your name on it — claim it whenever you like. No rush, and it never expires.</div>
+      <div class="ethclaimrow" id="ethclaimrow" hidden style="flex-direction:column;align-items:stretch;gap:8px">
+        <label style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">receive address <span style="text-transform:none;letter-spacing:0">(optional — defaults to your LUV wallet)</span></label>
+        <input id="recipientinput" type="text" placeholder="0x… — leave blank to use your created wallet" spellcheck="false" autocomplete="off"
+          style="font-family:var(--mono);font-size:13px;padding:11px 13px;border-radius:8px;border:1px solid var(--seam);background:var(--ink);color:var(--cream)">
+        <button class="claimnow" id="claimsponsored" type="button">🎁 Claim my 1,000,000,000,000 LUV — FREE ❤</button>
+        <span class="taskmsg" id="ethclaimmsg">gas is on us — no ETH needed. One tap and your trillion is delivered.</span>
+        <button class="btn" id="ethclaim" type="button" style="align-self:center" hidden>or claim yourself with your own ETH</button>
+        <div class="gasest" id="gasest" hidden></div>
+      </div>
+      <div class="timeline" id="timeline">
+        <div class="step" data-step="reserved"><div class="t">reserved</div><div class="d">Your trillion is recorded and waiting for you.</div></div>
+        <div class="step" data-step="submitted"><div class="t">claiming</div><div class="d">Your claim is on-chain, awaiting confirmation.</div></div>
+        <div class="step" data-step="confirmed"><div class="t">delivered</div><div class="d">1 trillion LUV is in your wallet.</div></div>
+      </div>
+      <div class="statusline" id="statusline">checking your gesture…</div>
+    </div>
+    <div class="panel" style="margin-top:16px" id="droppanel" hidden>
+      <div class="k">the LUVdrip — flowing to you now</div>
+
+      <!-- the live flow, and the act that banks it, side by side: you collect what you watch -->
+      <div class="flowrow">
+        <div id="luvdripmeter" class="flowmeter"></div>
+        <button class="bigbtn collect" id="dripcollectbtn" type="button" data-luv-emit disabled><b class="cbig">COLLECT</b> your LUV every 24 hrs</button>
+      </div>
+      <div class="collecthint" id="collecthint">free, and your million restarts the moment you press it</div>
+      <div class="collecthint" style="margin-top:4px">COLLECT banks your flow <b style="color:var(--cream)">here</b>, in your tally · <b style="color:var(--rose)">REDEEM</b> is the separate step that moves the tokens <b style="color:var(--cream)">into your wallet</b>, on chain</div>
+      <div id="dropclockrow" style="font-family:var(--mono);font-size:13px;color:var(--dim);margin-top:10px" hidden>
+        today's million completes in <b id="dropcount" style="color:var(--gold);font-size:18px;letter-spacing:.08em">--:--:--</b>
+      </div>
+      <div class="taskmsg" id="dropseason" hidden></div>
+      <div class="taskmsg" id="dropmsg">checking your LUVdrip…</div>
+      <div class="taskmsg ok" id="dropfull" hidden>🎁 <b>today's 1,000,000 LUV is complete</b> — saved to your tally · <b>sign in again to start the next million</b> · thanks a million ❤
+        <a href="https://twitter.com/intent/tweet?text=the%20LUVdrip%20is%20flowing%20%E2%80%94%20a%20million%20LUV%20a%20day%20just%20for%20logging%20in%20%E2%9D%A4%20HOLD%20LUV%20to%20watch%20LUV%20grow%20%40shambaluv%20%23SHAMBALUV%20https%3A%2F%2Fluv.pythai.net" target="_blank" rel="noopener">𝕏 tweet to earn more LUV →</a></div>
+
+      <div class="holdrow">
+        <div class="holdcard lead">
+          <div class="hk">collected — yours, waiting</div>
+          <div class="hv"><span id="accluv">—</span><span class="hu"> LUV</span></div>
+          <div class="hsub" id="accusd"></div>
+        </div>
+        <div class="holdcard">
+          <div class="hk">in your wallet — on chain</div>
+          <div class="hv"><span id="holdluv">—</span><span class="hu"> LUV</span></div>
+          <div class="hsub" id="holdsub">delivered and yours to hold</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;font-size:14px"><b id="dropreward" style="color:var(--rose)">1,000,000</b> LUV a day — dripping at <b style="color:var(--gold)">11.574 LUV/s</b> for a <b>full 24 hours</b> from your log in ❤</div>
+      <div style="color:var(--dim);font-size:13px"><b style="color:var(--cream)">Logging in earns the million.</b> The drip keeps running whether or not this tab is open. <b style="color:var(--cream)">COLLECT</b> banks what has flowed and starts your million over from that moment — free, and yours to press whenever you like. <b style="color:var(--cream)">REDEEM</b> is the only step that touches the chain, so it is the only one that costs gas.</div>
+
+      <!-- and underneath it all: the one step that reaches the chain -->
+      <div class="redeemfoot">
+        <div class="rf-k">REDEEM — the separate step that <b>moves your LUV into your wallet</b></div>
+        <div class="rf-note">Collecting banks your flow in the tally above; it does not move a token. <b>REDEEM sends it
+          on chain</b>, out of the ledger and into the wallet you hold — where it is yours to send, hold, or trade, and
+          where reflections start growing it. Two acts, deliberately separate: collect as often as you like, redeem when
+          you want the tokens in hand.</div>
+        <button class="bigbtn redeem wide" id="redeemsponsorbtn" type="button" disabled>🚌 REDEEM on the LUVbus
+          <small>moves your LUV into your wallet · no ETH needed · the bus pays the gas</small></button>
+        <div class="sponsorline">or send it yourself, from a wallet that holds ETH:
+          <button class="btn" id="redeemselfbtn" type="button" disabled style="font-size:12px;padding:6px 12px">💎 REDEEM with my own ETH</button></div>
+        <div style="color:var(--dim);font-size:13px;margin-top:8px;font-family:var(--mono)" id="accgas">estimating the redeem gas…</div>
+        <div class="taskmsg" id="accheld" hidden></div>
+        <div class="taskmsg" id="redeemmsg"></div>
+      </div>
+      <div style="margin-top:10px;color:var(--dim);font-size:13px"><b style="color:var(--gold)">HOLD LUV to watch LUV grow</b> — 3% of every trade reflects to every holder, automatically ❤</div>
+    </div>
+    <div class="panel" style="margin-top:16px" id="tradepanel">
+      <div class="k">Trade LUV</div>
+      <div class="comingsoon" style="border-color:#FF007A">🦄 <b>LUV is live on Uniswap</b> — buy &amp; sell the gesture on the open market ❤
+        <span>Trade the LUV/ETH pair directly. Set slippage to <b>10%</b>: LUV carries a 5% reflection fee and a young pool moves when you enter it.</span>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <a class="uni-cta" data-luv-emit href="https://app.uniswap.org/swap?chain=mainnet&amp;inputCurrency=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&amp;outputCurrency=0x2711111111683B8708cb9a48cBf36a51315F8254" target="_blank" rel="noopener"><img src="gfx/brand/uniswap_icon_white.svg" alt="" style="width:18px;height:18px"> Buy LUV on Uniswap</a>
+      <a class="addmm btn" href="#add-to-metamask" role="button"><img src="gfx/brand/metamask-fox.svg" alt="" style="width:18px;height:18px">Add LUV to MetaMask</a>
+        <a class="btn" href="chart.html">the chart</a>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px" id="taskspanel">
+      <div class="k">share the LUV — earn more</div>
+      <div class="comingsoon" style="border-color:rgba(126,226,160,.55)">✨ <b>Sharing is Caring</b> ❤
+        <span>Your daily <b>LUVdrip</b> flows above — <b>a million LUV a day, earned by logging in</b>. Want more? <b>Tweet about LUV</b> — sharing IS the marketing, and the earn rail rewards it.</span>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <a class="btn" href="https://twitter.com/intent/tweet?text=the%20LUVdrip%20is%20flowing%20%E2%80%94%20a%20million%20LUV%20a%20day%20%E2%9D%A4%20HOLD%20LUV%20to%20watch%20LUV%20grow%20%40shambaluv%20%23SHAMBALUV%20https%3A%2F%2Fluv.pythai.net" target="_blank" rel="noopener">𝕏 tweet to earn LUV</a>
+      </div>
+    </div>
+    <div class="dashfoot">
+      <button class="btn" id="addtoken2" type="button" hidden>add LUV to MetaMask</button>
+      <button class="btn" id="logout" type="button">sign out</button>
+    </div>
+    <!-- ids the dashboard script still addresses from the first site, kept so nothing throws -->
+    <div class="compat" aria-hidden="true"><span id="strip"><span id="statebadge"></span><span id="luvaddr"></span><button id="copyaddr" type="button"></button><a id="explorelink" href="#"></a><button id="addtoken" type="button"></button></span><span id="claimed-count"><b id="claimed-n"></b></span><div id="tasklist"></div><div id="mysubs"></div><button id="connectbtn" type="button"></button><button id="collectword" type="button"></button><button id="collectbtn" type="button"></button><button id="loginbtn" type="button"></button></div>
+  </div>
+</main>
+
+<div id="loginmodal" role="dialog" aria-modal="true" aria-labelledby="modaltitle">
+  <div class="modalcard">
+    <h3 id="modaltitle">Open your LUVwallet</h3>
+    <div class="sub">sign in and your wallet is created, then handed to you</div>
+    <div class="modalproviders" id="modalproviders"><div class="soon">the sign-in desk is waking up…</div></div>
+    <button class="btn close" id="modalclose" type="button">close</button>
+    <div class="fine">self-hosted sign-in · your wallet is yours · no third-party wallet vendor</div>
+  </div>
+</div>
+<div class="wmodal" id="recvmodal" role="dialog" aria-modal="true">
+  <div class="modalcard"><h3>Receive LUV</h3><div class="sub">send LUV or ETH to this address on Ethereum mainnet</div>
+    <div class="walletaddr" id="recv-addr">…</div>
+    <div class="row"><button class="btn" id="recv-copy" type="button">copy</button><a class="btn" id="recv-explorer" href="#" target="_blank" rel="noopener">on Etherscan</a><button class="btn" id="recv-close" type="button">close</button></div>
+  </div>
+</div>
+<div class="wmodal" id="sendmodal" role="dialog" aria-modal="true">
+  <div class="modalcard"><h3>Send LUV</h3><div class="sub">wallet to wallet there is no fee: 1 LUV == 1 LUV</div>
+    <label>to<input id="send-to" placeholder="0x…" autocomplete="off" spellcheck="false"></label>
+    <label>amount, LUV<input id="send-amt" placeholder="1000000" inputmode="decimal"></label>
+    <div class="row"><button class="bigbtn" id="send-go" type="button">send</button><button class="btn" id="send-close" type="button">close</button></div>
+    <div class="taskmsg" id="send-msg"></div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div><p class="mark">SHAMBA LUV</p><ul><li>LUV <a class="addr" href="https://etherscan.io/token/0x2711111111683B8708cb9a48cBf36a51315F8254" target="_blank" rel="noopener">0x2711111111683B8708cb9a48cBf36a51315F8254</a></li><li>Built to the <a href="https://github.com/cypherpunk4096/standard" target="_blank" rel="noopener">cypherpunk4096</a> standard.</li></ul></div>
+  <div><p class="mark">Read</p><ul><li><a href="index.html">home</a> · <a href="faq.html">FAQ</a> · <a href="chart.html">chart</a> · <a href="roadmap.html">roadmap</a> · <a href="liqlock.html">the lock</a></li><li><a href="https://github.com/cypherpunk4096/LUVwallet" target="_blank" rel="noopener">LUVwallet source</a> · <a href="https://github.com/SHAMBA-LUV" target="_blank" rel="noopener">github.com/SHAMBA-LUV</a></li></ul></div>
+  <div><p class="mark">Follow</p><ul><li><a href="https://x.com/shambaluv" target="_blank" rel="noopener">@shambaluv</a> · <a href="https://t.me/+yTfFYQlH53pmODcx" target="_blank" rel="noopener">Telegram</a></li><li><a href="mailto:luv@pythai.net">luv@pythai.net</a></li></ul></div>
+</div></footer>
+<script src="substrate/qrcode.js?v=1"></script>
+<script src="substrate/luv-drip.js?v=3"></script>
+<script src="luv.app.js?v=40"></script>
+<script src="app.js?v=1"></script>
+<script src="site.js?v=13"></script>
+</body>
+</html>

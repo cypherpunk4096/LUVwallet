@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUV card — SHAMBA LUV</title>
+<meta name="description" content="A LUV card: one wallet's LUV on Ethereum, read live from the chain by your own browser. Made with LUV, built to the cypherpunk4096 standard.">
+<link rel="canonical" href="https://luv.pythai.net/card.html">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="gfx/heart.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SHAMBA LUV">
+<meta property="og:title" content="LUV card — SHAMBA LUV">
+<meta property="og:description" content="One wallet's LUV on Ethereum, read live from the chain. Made with LUV.">
+<meta property="og:image" content="https://luv.pythai.net/gfx/og-card.png?v=2">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@shambaluv">
+<link rel="stylesheet" href="site.css?v=10">
+<style>
+.cardpage{max-width:720px;margin:0 auto;padding:clamp(24px,6vw,60px) var(--pad)}
+.luvcard{position:relative;overflow:hidden;border-radius:22px;padding:28px;
+  background:radial-gradient(120% 140% at 0% 0%,rgba(227,178,95,.18),transparent 55%),linear-gradient(135deg,#1d1330,#150d22 60%,#1a1030);
+  border:1px solid rgba(227,178,95,.6);box-shadow:0 30px 80px -30px rgba(227,178,95,.65),inset 0 1px 0 rgba(255,255,255,.08)}
+.luvcard .top{display:flex;align-items:center;gap:14px}
+.luvcard .top img{width:64px;height:64px;border-radius:50%;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.luvcard .top b{font-family:var(--serif);font-weight:500;font-size:1.7rem;display:block}
+.luvcard .top span{color:var(--muted)}
+.luvcard .grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:end;margin-top:22px}
+.luvcard .grid>div:first-child{min-width:0}
+@media (max-width:600px){.luvcard .grid{grid-template-columns:1fr}}
+.luvcard .bal{font-family:var(--serif);font-size:clamp(1.5rem,4.2vw,2.4rem);color:var(--gold-2);line-height:1.1;overflow-wrap:anywhere}
+.luvcard .bal small{font-size:1rem;color:var(--muted);display:block;font-family:var(--sans)}
+.luvcard .usd{color:var(--ink-2);margin-top:6px}
+.luvcard .addr{font-family:var(--mono);font-size:.85rem;color:var(--gold-2);word-break:break-all;margin-top:14px;user-select:all}
+.luvcard .qr{background:#fff;padding:10px;border-radius:12px;width:156px;height:156px;display:grid;place-items:center}
+.luvcard .qr svg{width:136px;height:136px;display:block}
+.luvcard .foot{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:20px;padding-top:14px;border-top:1px solid rgba(227,178,95,.25);font-size:.85rem;color:var(--muted)}
+.luvcard .foot a{color:var(--gold-2)}
+.cp4096{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--seam);border-radius:999px;padding:3px 10px;color:var(--ink-2);text-decoration:none;font-family:var(--mono);font-size:.78rem}
+.cp4096:hover{border-color:var(--verified);color:var(--verified)}
+.acts{list-style:none;margin-top:18px}
+.share{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.empty{color:var(--muted);margin-top:18px}
+.empty input{font:inherit;font-family:var(--mono);width:100%;max-width:46ch;background:var(--surface);color:var(--ink);border:1px solid var(--seam);border-radius:10px;padding:10px 12px;margin-top:8px}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><img src="gfx/logo-transparent.png" alt="">SHAMBA LUV</a>
+  <a class="link" href="faq.html">FAQ</a>
+  <a class="link" href="chart.html">Chart</a>
+  <a class="link" href="roadmap.html">Roadmap</a>
+  <a class="link" href="app.html">Wallet</a>
+  <a class="buy" href="https://app.uniswap.org/swap?chain=mainnet&amp;inputCurrency=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&amp;outputCurrency=0x2711111111683B8708cb9a48cBf36a51315F8254" target="_blank" rel="noopener"><img src="gfx/brand/uniswap_icon_white.svg" alt=""><span>Buy LUV</span></a>
+</div></nav>
+<main class="cardpage">
+  <p class="kicker">A LUV card</p>
+  <div class="luvcard" id="luvcard" hidden>
+    <div class="top"><img src="gfx/logo.png" alt=""><div><b id="cname">LUVwallet</b><span id="ckind">on Ethereum, read live from the chain</span></div></div>
+    <div class="grid">
+      <div>
+        <div class="bal"><span id="cbal">…</span><small>LUV, held</small></div>
+        <div class="usd" id="cusd"></div>
+        <div class="addr" id="caddr"></div>
+      </div>
+      <div class="qr" id="cqr"></div>
+    </div>
+    <div class="foot">
+      <a class="cp4096" href="https://github.com/cypherpunk4096/standard" target="_blank" rel="noopener">⟁ cypherpunk4096</a>
+      <a class="cp4096" href="https://github.com/cypherpunk4096/LUVwallet" target="_blank" rel="noopener">LUVwallet</a>
+      <span>made with <a href="https://luv.pythai.net/">LUV ❤</a></span>
+      <span id="cblock"></span>
+    </div>
+  </div>
+  <div class="share" id="share" hidden>
+    <a class="buy" id="sharex" href="#" target="_blank" rel="noopener">post on 𝕏</a>
+    <a class="alt" id="sharetg" href="#" target="_blank" rel="noopener">share on Telegram</a>
+    <button type="button" class="copybtn" id="sharecopy" data-copy="">copy card link</button>
+    <a class="alt" id="cscan" href="#" target="_blank" rel="noopener">on Etherscan</a>
+  </div>
+  <div class="empty" id="empty">
+    <p>Show any wallet's LUV as a card. Paste an Ethereum address:</p>
+    <input id="addrin" placeholder="0x…" autocomplete="off" spellcheck="false">
+    <p class="small">Your own card is one click from <a href="app.html">your LUVwallet</a>.</p>
+  </div>
+  <ul class="acts">
+    <li class="chain"><span class="k">✓</span>Every number here is an <code>eth_call</code> your browser makes to Ethereum: <code>balanceOf</code> on the LUV token, the pair's reserves for the price.</li>
+    <li class="doc"><span class="k">📄</span><a href="https://github.com/cypherpunk4096/LUVwallet" target="_blank" rel="noopener">The LUVwallet project</a>: the smart account, the key handoff, this card.</li>
+  </ul>
+</main>
+<footer><div class="wrap">
+  <div><p class="mark">SHAMBA LUV</p><ul><li>LUV <a class="addr" href="https://etherscan.io/token/0x2711111111683B8708cb9a48cBf36a51315F8254" target="_blank" rel="noopener">0x2711111111683B8708cb9a48cBf36a51315F8254</a></li><li>Built to the <a href="https://github.com/cypherpunk4096/standard" target="_blank" rel="noopener">cypherpunk4096</a> standard.</li></ul></div>
+  <div><p class="mark">Read</p><ul><li><a href="index.html">home</a> · <a href="faq.html">FAQ</a> · <a href="chart.html">chart</a> · <a href="roadmap.html">roadmap</a></li></ul></div>
+  <div><p class="mark">Follow</p><ul><li><a href="https://x.com/shambaluv" target="_blank" rel="noopener">@shambaluv</a> · <a href="https://t.me/+yTfFYQlH53pmODcx" target="_blank" rel="noopener">Telegram</a></li></ul></div>
+</div></footer>
+<script src="substrate/qrcode.js?v=1"></script>
+<script src="card.js?v=2"></script>
+<script src="site.js?v=13"></script>
+</body>
+</html>
