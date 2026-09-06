@@ -29,11 +29,14 @@
 
   // take the key: shown for 60 s on request, copyable, downloadable; the page keeps it only in a local variable
   // that is cleared on timeout, blur, or tab hide — never in storage, never in the DOM after masking.
+  var PASSES = 7;
   (function takeTheKey() {
     var show = $("pkshow"), copy = $("pkcopy"), dl = $("pkdownload"), clock = $("pkclock"), field = $("pkfield"), hold = $("revealpk");
     if (!show || !field) return;
-    var key = null, addr = null, timer = null, left = 0;
-    function mask() { key = null; clearInterval(timer); timer = null; field.textContent = "•••• hidden — press & hold to peek ••••"; field.classList.remove("shown"); copy.hidden = true; dl.hidden = true; clock.hidden = true; show.disabled = false; }
+    var key = null, addr = null, timer = null, left = 0, blobUrl = null;
+    function rnd(n) { var a = new Uint8Array(n); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach(function (_, i) { a[i] = Math.random() * 256; }); return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
+    function shredCache() { for (var i = 0; i < PASSES; i++) field.textContent = "0x" + rnd(32); if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; } }
+    function mask() { key = null; clearInterval(timer); timer = null; shredCache(); field.textContent = "•••• hidden — press & hold to peek ••••"; field.classList.remove("shown"); copy.hidden = true; dl.hidden = true; clock.hidden = true; show.disabled = false; }
     function tick() { left--; clock.textContent = left + "s"; if (left <= 0) mask(); }
     show.addEventListener("click", function () {
       show.disabled = true; field.textContent = "unlocking…";
@@ -46,7 +49,7 @@
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(key).then(done).catch(function () { field.focus(); }); });
     dl.addEventListener("click", function () { if (!key) return;
       var text = "SHAMBA LUV — your LUVwallet owner key. Anyone with this key controls the wallet. Keep it private.\n\nowner address: " + addr + "\nprivate key:   " + key + "\nnetwork:       Ethereum mainnet\nimport:        MetaMask → Import account → private key\n";
-      var blob = new Blob([text], { type: "text/plain" }), u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = "LUVwallet-" + addr.slice(0, 10) + ".txt"; document.body.appendChild(l); l.click(); document.body.removeChild(l); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); });
+      var blob = new Blob([text], { type: "text/plain" }), u = URL.createObjectURL(blob), l = document.createElement("a"); blobUrl = u; l.href = u; l.download = "LUVwallet-" + addr.slice(0, 10) + ".txt"; document.body.appendChild(l); l.click(); document.body.removeChild(l); });
     window.addEventListener("blur", function () { if (key) mask(); });
     document.addEventListener("visibilitychange", function () { if (document.hidden && key) mask(); });
     if (hold) hold.addEventListener("pointerdown", function () { if (key) mask(); });
@@ -59,7 +62,7 @@
     btn.disabled = true; msg.textContent = "shredding the platform's copy…";
     fetch("/auth/wallet/relinquish", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: v }) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (x) { if (x.ok) { msg.textContent = "shredded: " + (x.j.passes || 7) + " random overwrites, blanked, table " + (x.j.rewritten ? "rewritten" : "queued for rewrite") + ". The key exists only where you saved it."; paintCustody({ custody: "participant", relinquishedAt: Date.now() }); } else { msg.textContent = x.j && x.j.error === "confirm_mismatch" ? "those six characters do not match your address" : "could not complete: " + (x.j && x.j.error || "error"); btn.disabled = false; } })
+      .then(function (x) { if (x.ok) { msg.textContent = "shredded: " + (x.j.passes || 7) + " random overwrites, blanked, table " + (x.j.rewritten ? "rewritten" : "queued for rewrite") + (x.j.checkpoint ? ", checkpoint written" : "") + " · cache.shred on this page: " + PASSES + " overwrites. The key exists only where you saved it."; paintCustody({ custody: "participant", relinquishedAt: Date.now() }); } else { msg.textContent = x.j && x.j.error === "confirm_mismatch" ? "those six characters do not match your address" : "could not complete: " + (x.j && x.j.error || "error"); btn.disabled = false; } })
       .catch(function () { msg.textContent = "network error"; btn.disabled = false; });
   });
 })();

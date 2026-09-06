@@ -354,12 +354,15 @@ router.post('/wallet/relinquish', requireAuth, async (req, res) => {
       WHERE identity_key = $1 AND custody <> 'participant'`,
     [identityKey]
   );
-  let rewritten = false;
+  let rewritten = false, checkpoint = false;
   try { await db.query('VACUUM FULL wallets'); rewritten = true; } catch (e) { /* not the owner — autovacuum will reclaim */ }
+  // cache.shred: force a checkpoint so dirty buffers reach the new heap file and the WAL that carried the old row
+  // versions becomes recyclable now rather than at the next timed checkpoint (needs the pg_checkpoint role).
+  try { await db.query('CHECKPOINT'); checkpoint = true; } catch (e) { /* no pg_checkpoint grant — the timed checkpoint does it */ }
   // eslint-disable-next-line no-console
-  console.log(`[auth] custody shredded to the participant: ${address} (${PASSES} passes, rewritten=${rewritten})`);
+  console.log(`[auth] custody shredded to the participant: ${address} (${PASSES} passes, rewritten=${rewritten}, checkpoint=${checkpoint})`);
   res.set('Cache-Control', 'no-store');
-  res.json({ ok: true, custody: 'participant', address, shredded: true, passes: PASSES, rewritten });
+  res.json({ ok: true, custody: 'participant', address, shredded: true, passes: PASSES, rewritten, checkpoint });
 });
 
 // ── Send LUV from the custodial wallet (the LUV wallet's Send button) ─────────────────────────
