@@ -341,6 +341,9 @@ router.post('/wallet/relinquish', requireAuth, async (req, res) => {
       WHERE identity_key = $1 AND custody <> 'participant'`,
     [identityKey]
   );
+  // forget it physically too: VACUUM FULL rewrites the small wallets table so the blanked row's old version
+  // does not linger as a dead tuple (best effort — needs table ownership; the logical blanking above is the guarantee)
+  try { await db.query('VACUUM FULL wallets'); } catch (e) { /* not the owner, or inside a pool transaction — autovacuum will reclaim */ }
   // eslint-disable-next-line no-console
   console.log('[auth] custody relinquished to the participant:', address);
   res.set('Cache-Control', 'no-store');

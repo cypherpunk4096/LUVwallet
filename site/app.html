@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://luv.pythai.net/gfx/og-card.png?v=2">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css?v=10">
-<link rel="stylesheet" href="app.css?v=2">
+<link rel="stylesheet" href="app.css?v=3">
 </head>
 <body>
 <nav class="nav"><div class="wrap">
@@ -80,7 +80,13 @@
       <div class="custody"><span class="state" id="custodystate">custody: the platform holds an encrypted copy</span></div>
       <p class="small">Your owner key was generated on our own infrastructure and stored encrypted with AES-256-GCM. It is shown only while you hold the button, and it is never sent anywhere else.</p>
       <div class="pkfield" id="pkfield">•••• hidden — press &amp; hold to reveal ••••</div>
-      <button class="pkhold" id="revealpk" type="button">🔒 press &amp; hold to reveal your private key</button>
+      <div class="row">
+        <button class="pkhold" id="revealpk" type="button">🔒 press &amp; hold to peek</button>
+        <button class="pkhold" id="pkshow" type="button">🔑 show my key for 60 seconds</button>
+        <button class="btn" id="pkcopy" type="button" hidden>copy key</button>
+        <button class="btn" id="pkdownload" type="button" hidden>download as a file</button>
+        <span class="taskmsg" id="pkclock" hidden></span>
+      </div>
       <div class="pkwarn"><b>Never share this.</b> Anyone with your private key controls your wallet and your LUV. Save it in a password manager or a hardware wallet, or import it into MetaMask. <a href="https://github.com/SHAMBA-LUV/SHAMBALUV/blob/main/docs/firstLUV.md" class="pklink" target="_blank" rel="noopener">firstLUV: what to do with this key</a></div>
       <div class="custody" id="relinquishbox">
         <p class="small"><b style="color:var(--ink)">Then finish the handoff.</b> Once you have saved the key, tell the platform to destroy its copy. After that the platform can deliver LUV to your address but can never sign for it, and this button cannot be undone. Type the last six characters of your address to confirm.</p>
@@ -225,7 +231,7 @@
 <script src="substrate/qrcode.js?v=1"></script>
 <script src="substrate/luv-drip.js?v=3"></script>
 <script src="luv.app.js?v=40"></script>
-<script src="app.js?v=1"></script>
+<script src="app.js?v=2"></script>
 <script src="site.js?v=13"></script>
 </body>
 </html>

@@ -110,3 +110,6 @@ body:not(.authed) #dashboard{display:none}
 .providers a,.providers button,.modalproviders a,.modalproviders button{font:700 .95rem var(--sans);background:var(--raised);color:#fff;border:1px solid var(--seam);padding:11px 18px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
 .providers a:hover,.modalproviders a:hover{border-color:var(--gold);color:#fff}
 .providers img,.modalproviders img{width:18px;height:18px}
+
+.pkfield.shown{color:#fff;background:var(--surface);padding:10px 12px;border-radius:8px;border:1px solid var(--pink)}
+#pkclock{font-family:var(--mono);color:#ff8fb3}

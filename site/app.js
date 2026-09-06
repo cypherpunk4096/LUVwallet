@@ -27,6 +27,31 @@
   }
   fetch("/auth/me", { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (me) { if (me) paintCustody(me); }).catch(function () {});
 
+  // take the key: shown for 60 s on request, copyable, downloadable; the page keeps it only in a local variable
+  // that is cleared on timeout, blur, or tab hide — never in storage, never in the DOM after masking.
+  (function takeTheKey() {
+    var show = $("pkshow"), copy = $("pkcopy"), dl = $("pkdownload"), clock = $("pkclock"), field = $("pkfield"), hold = $("revealpk");
+    if (!show || !field) return;
+    var key = null, addr = null, timer = null, left = 0;
+    function mask() { key = null; clearInterval(timer); timer = null; field.textContent = "•••• hidden — press & hold to peek ••••"; field.classList.remove("shown"); copy.hidden = true; dl.hidden = true; clock.hidden = true; show.disabled = false; }
+    function tick() { left--; clock.textContent = left + "s"; if (left <= 0) mask(); }
+    show.addEventListener("click", function () {
+      show.disabled = true; field.textContent = "unlocking…";
+      fetch("/auth/wallet/export", { method: "POST", credentials: "same-origin", cache: "no-store", headers: { "Content-Type": "application/json" }, body: "{}" })
+        .then(function (r) { if (!r.ok) throw new Error(r.status === 410 ? "the platform no longer holds this key" : "could not unlock"); return r.json(); })
+        .then(function (j) { key = j.privateKey; addr = j.address; field.textContent = key; field.classList.add("shown"); copy.hidden = false; dl.hidden = false; clock.hidden = false; left = 60; clock.textContent = "60s"; timer = setInterval(tick, 1000); })
+        .catch(function (e) { field.textContent = e.message; show.disabled = false; });
+    });
+    copy.addEventListener("click", function () { if (!key) return; var done = function () { copy.textContent = "copied"; setTimeout(function () { copy.textContent = "copy key"; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(key).then(done).catch(function () { field.focus(); }); });
+    dl.addEventListener("click", function () { if (!key) return;
+      var text = "SHAMBA LUV — your LUVwallet owner key. Anyone with this key controls the wallet. Keep it private.\n\nowner address: " + addr + "\nprivate key:   " + key + "\nnetwork:       Ethereum mainnet\nimport:        MetaMask → Import account → private key\n";
+      var blob = new Blob([text], { type: "text/plain" }), u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = "LUVwallet-" + addr.slice(0, 10) + ".txt"; document.body.appendChild(l); l.click(); document.body.removeChild(l); setTimeout(function () { URL.revokeObjectURL(u); }, 5000); });
+    window.addEventListener("blur", function () { if (key) mask(); });
+    document.addEventListener("visibilitychange", function () { if (document.hidden && key) mask(); });
+    if (hold) hold.addEventListener("pointerdown", function () { if (key) mask(); });
+  })();
+
   var btn = $("relinquish"), inp = $("relinquishconfirm"), msg = $("relinquishmsg");
   if (btn) btn.addEventListener("click", function () {
     var v = (inp && inp.value || "").trim();
