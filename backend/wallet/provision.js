@@ -169,6 +169,7 @@ async function getWalletAddress(identityKey) {
 }
 
 module.exports = {
+  counterfactualAccount,
   provisionWallet,
   getUserSigner,
   getWalletAddress,

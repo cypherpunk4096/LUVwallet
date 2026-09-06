@@ -113,3 +113,5 @@ body:not(.authed) #dashboard{display:none}
 
 .pkfield.shown{color:#fff;background:var(--surface);padding:10px 12px;border-radius:8px;border:1px solid var(--pink)}
 #pkclock{font-family:var(--mono);color:#ff8fb3}
+
+.custody .state.client{color:var(--verified);border-color:rgba(63,240,176,.5)}

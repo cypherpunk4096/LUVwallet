@@ -309,6 +309,7 @@ router.post('/logout', (req, res) => {
 router.post('/wallet/export', requireAuth, async (req, res) => {
   const { identityKey, provider } = req.identity;
   if (provider === 'metamask') return res.status(400).json({ error: 'external_wallet' });
+  { const c = await db.query('SELECT custody FROM wallets WHERE identity_key = $1', [identityKey]); if (c.rowCount && c.rows[0].custody === 'client') return res.status(410).json({ error: 'client_controlled' }); }
   try {
     const { getUserSigner } = require('../wallet/provision');
     const w = await getUserSigner(identityKey);
@@ -363,6 +364,54 @@ router.post('/wallet/relinquish', requireAuth, async (req, res) => {
   console.log(`[auth] custody shredded to the participant: ${address} (${PASSES} passes, rewritten=${rewritten}, checkpoint=${checkpoint})`);
   res.set('Cache-Control', 'no-store');
   res.json({ ok: true, custody: 'participant', address, shredded: true, passes: PASSES, rewritten, checkpoint });
+});
+
+// ── Bind a CLIENT-CONTROLLED wallet — the standard ─────────────────────────────────────────────
+// The key is generated and held on the participant's own machine (the client controller in the LUVwallet
+// page); the platform only ever sees a signature. The signed challenge is the same one MetaMask sign-in
+// uses. From here the platform delivers to this address and can never sign for it (custody = 'client').
+// A platform-held wallet must be taken and shredded FIRST (handoff), so no key is ever abandoned unheld.
+router.post('/wallet/bind', requireAuth, async (req, res) => {
+  const { identityKey, provider } = req.identity;
+  if (provider === 'metamask') return res.status(400).json({ error: 'external_wallet' });
+  const { address, signature, challengeToken } = req.body || {};
+  if (typeof address !== 'string' || !ADDR_RE.test(address) || typeof signature !== 'string' || typeof challengeToken !== 'string') {
+    return res.status(400).json({ error: 'invalid_request' });
+  }
+  let claim;
+  try { claim = jwt.verify(challengeToken, config.jwtSecret, { issuer: 'shambaluv-auth' }); }
+  catch (e) { return res.status(400).json({ error: 'challenge_expired' }); }
+  const checksummed = ethers.getAddress(address);
+  if (claim.sub !== 'wallet-challenge' || claim.address !== checksummed) return res.status(400).json({ error: 'challenge_mismatch' });
+  const message = `SHAMBA LUV ❤ sign-in\n\nwallet: ${claim.address}\nnonce: ${claim.nonce}\n\nSigning proves you control this wallet. This request costs nothing.`;
+  let recovered;
+  try { recovered = ethers.verifyMessage(message, signature); } catch (e) { return res.status(400).json({ error: 'bad_signature' }); }
+  if (recovered.toLowerCase() !== checksummed.toLowerCase()) return res.status(401).json({ error: 'signature_mismatch' });
+  const row = await db.query('SELECT address, custody, enc_ciphertext FROM wallets WHERE identity_key = $1', [identityKey]);
+  if (row.rowCount > 0 && row.rows[0].custody === 'platform' && row.rows[0].enc_ciphertext) {
+    return res.status(409).json({ error: 'take_the_key_first', address: row.rows[0].address });
+  }
+  const prov = require('../wallet/provision');
+  let smartAccount = null;
+  try { if (config.aaFactoryAddress && prov.counterfactualAccount) smartAccount = await prov.counterfactualAccount(checksummed); } catch (e) { smartAccount = null; }
+  try {
+    if (row.rowCount > 0) {
+      await db.query(
+        `UPDATE wallets SET address = $2, smart_account = $3, enc_ciphertext = '', enc_iv = '', enc_tag = '', custody = 'client', relinquished_at = COALESCE(relinquished_at, now()) WHERE identity_key = $1`,
+        [identityKey, checksummed, smartAccount]);
+    } else {
+      await db.query(
+        `INSERT INTO wallets (identity_key, address, enc_ciphertext, enc_iv, enc_tag, enc_alg, smart_account, custody, relinquished_at) VALUES ($1, $2, '', '', '', 'none', $3, 'client', now())`,
+        [identityKey, checksummed, smartAccount]);
+    }
+  } catch (e) {
+    if (e && e.code === '23505') return res.status(409).json({ error: 'address_in_use' });
+    throw e;
+  }
+  // eslint-disable-next-line no-console
+  console.log('[auth] client-controlled wallet bound:', checksummed, 'smart account', smartAccount);
+  res.set('Cache-Control', 'no-store');
+  res.json({ ok: true, custody: 'client', walletAddress: smartAccount || checksummed, ownerAddress: checksummed, smartAccount });
 });
 
 // ── Send LUV from the custodial wallet (the LUV wallet's Send button) ─────────────────────────

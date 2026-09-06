@@ -15,3 +15,11 @@
 Standard: cypherpunk4096 — determinism (one factory, one salt, one address per owner on every chain), zero dependencies on
 the page, verification over trust (every contract source-verified), consent over default (nothing is revealed or destroyed
 without the participant's press).
+
+## The standard path (no handoff needed)
+
+`site/luvwallet.js` → create on the machine → `POST /auth/wallet/challenge` → `wallet.signMessage(challenge)` →
+`POST /auth/wallet/bind {address, signature, challengeToken}` → `wallets` row with `custody='client'`, `enc_* = ''`,
+`smart_account = factory.getAddress(address)`. The platform delivers to that address and can never sign. `custody` values:
+`platform` (legacy, key held encrypted) · `participant` (legacy key taken and shredded) · `client` (generated on the client's
+machine, never held) · `external` (MetaMask sign-in, reported by `/auth/me` only).

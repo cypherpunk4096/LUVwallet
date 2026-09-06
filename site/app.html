@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://luv.pythai.net/gfx/og-card.png?v=2">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="site.css?v=10">
-<link rel="stylesheet" href="app.css?v=3">
+<link rel="stylesheet" href="app.css?v=4">
 </head>
 <body>
 <nav class="nav"><div class="wrap">
@@ -92,6 +92,31 @@
         <p class="small"><b style="color:var(--ink)">Then finish the handoff.</b> Once you have saved the key, tell the platform to shred its copy: the encrypted key is overwritten with random bytes seven times, blanked, the table is rewritten and a checkpoint is forced so no earlier version survives; this page shreds its own cache of the key the same way. After that the platform can deliver LUV to your address but can never sign for it. It cannot be undone. Type the last six characters of your address to confirm.</p>
         <div class="row"><input id="relinquishconfirm" placeholder="last 6" maxlength="6" autocomplete="off" spellcheck="false"><button class="btn" id="relinquish" type="button">shred the platform's copy · 7 passes</button><span class="taskmsg" id="relinquishmsg"></span></div>
       </div>
+    </div>
+
+    <!-- the standard: the client controller — a wallet generated and held on this machine; the platform verifies signatures -->
+    <div class="panel" id="clientwallet">
+      <div class="k">Your wallet on this machine — the standard</div>
+      <div class="custody"><span class="state" id="cwstate">none on this machine</span></div>
+      <p class="small">Client-side compute: the key is generated here, in your browser, encrypted under your passphrase and kept on this machine. The platform never sees it. You prove control by signing a challenge, and from then on LUV is delivered to this address while the platform holds nothing at all.</p>
+      <div class="walletaddr" id="cwaddr">no wallet on this machine yet</div>
+      <div class="row">
+        <input id="cw-pass" type="password" placeholder="passphrase for this machine" autocomplete="new-password" style="font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--seam);border-radius:8px;padding:9px 12px;width:26ch">
+        <button class="bigbtn" id="cw-create" type="button">create my wallet here</button>
+        <button class="btn" id="cw-import" type="button">import a key or keystore</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="cw-unlock" type="button" hidden>unlock</button>
+        <button class="btn" id="cw-lock" type="button" hidden>lock</button>
+        <button class="bigbtn" id="cw-bind" type="button" hidden>bind to my sign-in by signature</button>
+        <button class="btn" id="cw-sign" type="button" hidden>sign a message</button>
+        <button class="btn" id="cw-export" type="button" hidden>download keystore</button>
+        <button class="btn" id="cw-reveal" type="button" hidden>show key 30 s</button>
+        <button class="btn" id="cw-shred" type="button" hidden>shred on this machine · 7 passes</button>
+      </div>
+      <div class="pkfield shown" id="cw-key" hidden></div>
+      <div class="taskmsg" id="cwmsg"></div>
+      <p class="small">Order of operations if the platform still holds a key for you: take it and shred it above, then create or import your own here and bind it. Built to <a href="https://github.com/cypherpunk4096/standard" target="_blank" rel="noopener">cypherpunk4096</a>: sovereignty over custody, verification over trust. Source: <a href="https://github.com/cypherpunk4096/LUVwallet" target="_blank" rel="noopener">LUVwallet</a>.</p>
     </div>
 
     <!-- the gesture, the LUVdrip, trade, share — the ids the dashboard script drives -->
@@ -229,9 +254,11 @@
   <div><p class="mark">Follow</p><ul><li><a href="https://x.com/shambaluv" target="_blank" rel="noopener">@shambaluv</a> · <a href="https://t.me/+yTfFYQlH53pmODcx" target="_blank" rel="noopener">Telegram</a></li><li><a href="mailto:luv@pythai.net">luv@pythai.net</a></li></ul></div>
 </div></footer>
 <script src="substrate/qrcode.js?v=1"></script>
+<script src="substrate/ethers.umd.min.js?v=6.13.4"></script>
+<script src="luvwallet.js?v=1"></script>
 <script src="substrate/luv-drip.js?v=3"></script>
-<script src="luv.app.js?v=40"></script>
-<script src="app.js?v=4"></script>
+<script src="luv.app.js?v=50"></script>
+<script src="app.js?v=5"></script>
 <script src="site.js?v=13"></script>
 </body>
 </html>

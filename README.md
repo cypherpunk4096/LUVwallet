@@ -21,6 +21,17 @@ consent over default, verification over trust. Made with [LUV ❤](https://luv.p
 
 The token these wallets hold: SHAMBA LUV `0x2711111111683B8708cb9a48cBf36a51315F8254`, Ethereum mainnet, source verified.
 
+## The standard (operator, 2026-09-06)
+
+**Client-side compute. The client controller lives in the client's wallet, on the client's machine. The platform verifies
+signatures.** [`site/luvwallet.js`](site/luvwallet.js) is that controller: the key is generated in the browser (vendored
+ethers v6, no network), encrypted under the client's passphrase into the wallet's own keystore format and kept in that
+browser's storage (and downloadable, so MetaMask can import it). To attach it to a sign-in the client signs the same
+challenge MetaMask sign-in uses and `POST /auth/wallet/bind` verifies the signature and records the address with
+`custody = 'client'` — no key material is ever stored server-side, and export answers 410. Shred on the machine is seven random
+overwrites of the stored keystore before removal. The platform-generated wallet is the legacy path, and it must be taken and
+shredded (below) before a client-controlled address can be bound, so no key is ever left unheld.
+
 ## The handoff, in one paragraph
 
 Sign in (Google, GitHub, or MetaMask). For social identities a key pair is generated on our own box, the private key is

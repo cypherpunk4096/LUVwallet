@@ -22,6 +22,7 @@
     var c = me.custody || (me.provider === "metamask" ? "external" : "platform");
     st.className = "state " + c;
     if (c === "participant") { st.textContent = "custody: yours — the platform's copy was shredded" + (me.relinquishedAt ? " on " + new Date(me.relinquishedAt).toISOString().slice(0, 10) : ""); if (box) box.hidden = true; var f = $("pkfield"), b = $("revealpk"); if (f) f.textContent = "the platform no longer holds this key"; if (b) b.hidden = true; }
+    else if (c === "client") { if (pk) pk.hidden = true; }
     else if (c === "external") { if (pk) pk.hidden = true; }
     else { st.textContent = "custody: the platform holds an encrypted copy — reveal, save, then shred it"; if (box) box.hidden = false; }
   }
